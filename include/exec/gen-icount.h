@@ -2,6 +2,7 @@
 #define GEN_ICOUNT_H
 
 #include "exec/exec-all.h"
+#include "exec/tb-stats.h"
 
 /* Helpers for instruction counting code generation.  */
 
@@ -12,6 +13,15 @@ static inline void gen_io_start(void)
     tcg_gen_st_i32(tcg_constant_i32(1), cpu_env,
                    offsetof(ArchCPU, parent_obj.can_do_io) -
                    offsetof(ArchCPU, env));
+}
+
+static inline void gen_tb_exec_count(TranslationBlock *tb)
+{
+    if (tb_stats_enabled(tb, TB_EXEC_STATS)) {
+        TCGv_ptr ptr = tcg_temp_new_ptr();
+	tcg_gen_movi_ptr(ptr, (intptr_t)tb->tb_stats);
+        gen_helper_inc_exec_freq(ptr);
+    }
 }
 
 static inline void gen_tb_start(const TranslationBlock *tb)

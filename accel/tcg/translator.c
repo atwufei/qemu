@@ -53,6 +53,7 @@ void translator_loop(CPUState *cpu, TranslationBlock *tb, int *max_insns,
 
     ops->init_disas_context(db, cpu);
     tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
+    gen_tb_exec_count(tb);
 
     /* Start translating.  */
     gen_tb_start(db->tb);
